@@ -1,0 +1,8 @@
+pillow
+tensorflow
+numpy
+fastapi[standard]
+requests
+python-multipart
+pyright
+black
