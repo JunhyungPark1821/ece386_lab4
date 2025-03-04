@@ -6,3 +6,5 @@ requests
 python-multipart
 pyright
 black
+ai-edge-litert
+opencv-python
