@@ -8,6 +8,7 @@ import cv2
 from ai_edge_litert.interpreter import Interpreter, SignatureRunner
 import sys
 import numpy as np
+import tensorflow as tf
 
 
 def get_litert_runner(model_path: str) -> SignatureRunner:
@@ -33,12 +34,34 @@ def convert_image_to_numpy(image) -> np.ndarray:
         image (cv2.VideoCapture): An image from a webcam feed
     Returns:
         np.ndarray: A numpy array representing the image"""
-    resizedImage = cv2.resize(image, (130, 130))
+    resizedImage = cv2.resize(image, (150, 150))
+
     numpyArray = np.asarray(resizedImage)
-    return numpyArray
+
+    numpyArrayReshape = numpyArray.reshape(1, 150, 150, 3).astype(np.uint8)
+    
+    return numpyArrayReshape
     
 
 # TODO: Function to conduct inference
+def lite_inference(runner: SignatureRunner, imageArray) -> int:
+    """Runs inference on a LiteRT SignatureRunner
+    Args:
+        runner (SignatureRunner): A LiteRT SignatureRunner
+    Returns:
+        int: cat or dog"""
+    
+    # Invoke inference
+    output = runner(catdog_input=imageArray)  # Key matches top key from get_input_details()
+    # Extract the result fom the batch returned
+    result = output["output_0"][0][0]  # Key matches top key from get_output_details()
+
+    final_prediction = tf.where(result > 0.5, 1, 0)
+
+    print(final_prediction)
+    
+    return final_prediction
+
 
 def main():
 
@@ -71,6 +94,9 @@ def main():
                 img_array = convert_image_to_numpy(frame_rgb)
                 print("Image shape:", img_array.shape)  # Ensure shape matches model input
 
+                lite_inference(runner, img_array)
+
+
                 # Preview the image
                 cv2.imshow("Captured Image", frame)
                 print("Press any key to exit.")
@@ -79,6 +105,9 @@ def main():
                     if cv2.waitKey(0):
                         cv2.destroyAllWindows()
                         break
+                
+                
+
             else:
                 print("Failed to capture image.")
         
