@@ -39,9 +39,9 @@ def convert_image_to_numpy(image) -> np.ndarray:
     numpyArray = np.asarray(resizedImage)
 
     numpyArrayReshape = numpyArray.reshape(1, 150, 150, 3).astype(np.uint8)
-    
+
     return numpyArrayReshape
-    
+
 
 # TODO: Function to conduct inference
 def lite_inference(runner: SignatureRunner, imageArray) -> int:
@@ -50,16 +50,18 @@ def lite_inference(runner: SignatureRunner, imageArray) -> int:
         runner (SignatureRunner): A LiteRT SignatureRunner
     Returns:
         int: cat or dog"""
-    
+
     # Invoke inference
-    output = runner(catdog_input=imageArray)  # Key matches top key from get_input_details()
+    output = runner(
+        catdog_input=imageArray
+    )  # Key matches top key from get_input_details()
     # Extract the result fom the batch returned
     result = output["output_0"][0][0]  # Key matches top key from get_output_details()
 
     final_prediction = tf.where(result > 0.5, 1, 0)
 
     print(final_prediction)
-    
+
     return final_prediction
 
 
@@ -82,43 +84,40 @@ def main():
 
     # TODO: Loop to take pictures and invoke inference. Should loop until Ctrl+C keyboard interrupt.
     while True:
-        try: 
+        try:
             # Capture a frame
             ret, frame = webcam.read()
 
-            if ret: 
+            if ret:
                 # Convert BGR (OpenCV default) to RGB for TFLite
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
                 # Convert to a NumPy array
                 img_array = convert_image_to_numpy(frame_rgb)
-                print("Image shape:", img_array.shape)  # Ensure shape matches model input
+                print(
+                    "Image shape:", img_array.shape
+                )  # Ensure shape matches model input
 
                 lite_inference(runner, img_array)
 
-
                 # Preview the image
-                cv2.imshow("Captured Image", frame)
-                print("Press any key to exit.")
-                while True:
-                    # Window stays open until key press
-                    if cv2.waitKey(0):
-                        cv2.destroyAllWindows()
-                        break
-                
-                
+                # cv2.imshow("Captured Image", frame)
+                # print("Press any key to exit.")
+                # while True:
+                #     # Window stays open until key press
+                #     if cv2.waitKey(0):
+                #         cv2.destroyAllWindows()
+                #         break
 
             else:
                 print("Failed to capture image.")
-        
+
         except KeyboardInterrupt:
             break
-        
+
     # Release the camera
     webcam.release()
     print("Program complete")
-
-    
 
 
 # Executes when script is called by name
