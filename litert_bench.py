@@ -27,9 +27,9 @@ def convert_image_to_numpy(image) -> np.ndarray:
     numpyArray = np.asarray(resizedImage)
 
     numpyArrayReshape = numpyArray.reshape(1, 150, 150, 3).astype(np.uint8)
-    
+
     return numpyArrayReshape
-    
+
 
 # TODO: Function to conduct inference
 def keras_inference(keras_model, imageArray) -> int:
@@ -38,7 +38,7 @@ def keras_inference(keras_model, imageArray) -> int:
         runner (SignatureRunner): A LiteRT SignatureRunner
     Returns:
         int: cat or dog"""
-    
+
     # Invoke inference
     prediction = keras_model.predict(imageArray)
     final_prediction = tf.where(prediction > 0.5, 1, 0)
@@ -63,20 +63,21 @@ def main():
 
     # TODO: Loop to take pictures and invoke inference. Should loop until Ctrl+C keyboard interrupt.
     for i in range(10):
-        try: 
+        try:
             # Capture a frame
             ret, frame = webcam.read()
 
-            if ret: 
+            if ret:
                 # Convert BGR (OpenCV default) to RGB for TFLite
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
                 # Convert to a NumPy array
                 img_array = convert_image_to_numpy(frame_rgb)
-                print("Image shape:", img_array.shape)  # Ensure shape matches model input
+                print(
+                    "Image shape:", img_array.shape
+                )  # Ensure shape matches model input
 
                 keras_inference(keras_model, img_array)
-
 
                 # Preview the image
                 # cv2.imshow("Captured Image", frame)
@@ -86,20 +87,16 @@ def main():
                 #     if cv2.waitKey(0):
                 #         cv2.destroyAllWindows()
                 #         break
-                
-                
 
             else:
                 print("Failed to capture image.")
-        
+
         except KeyboardInterrupt:
             break
-        
+
     # Release the camera
     webcam.release()
     print("Program complete")
-
-    
 
 
 # Executes when script is called by name
