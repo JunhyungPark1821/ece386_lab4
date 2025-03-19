@@ -2,6 +2,7 @@
 
 | Stat | Keras | LiteRT | Difference (Keras - LiteRT) |
 | -------- | ------- | ------- | ------- |
+| model size (MB) | 26.3 | 2.387 | 23. 913 |
 | duration_time (ns) | 13009878540 | 1576031265 | 11433847275 |
 | user_time (ns) | 12510103010 | 590813796 | 11919289214 |
 | system_time (ns) | 955558016 | 107537160 | 848020856 |
@@ -19,20 +20,4 @@
 | mem_access_rd | 8500914063 | 311240116 | 8189673947 |
 
 
-Compare
-
-Running your .tflite model with 10 images per run vs 40 images per run
-
-Running your .tflite model with LiteRT vs your .keras model with Keras
-
-Discuss the results in your README.md. Make sure you emphasize
-
-Relative model sizes
-
-Relative performance for more vs. fewer images per run, and why
-
-Pipeline stalls waiting for memory
-
-L2 invalidations (meaning something in the L2 cache had to be overwritten)
-
-LLC loads and misses
+First, the model size of the litert model is significantly smaller than the keras model. The difference is 23.913 MB between keras model and litert model. The model size affects the time and cycles necessary for making predictions. The duration time, user time, system time, and cpu cycles for the keras model are significantly higher than the litert model. Additionally, the keras model has higher cache misses than litert model as well, which explains higher time and cycles required with the keras model having to find data in a higher level memory than caches. Furthermore, keras model made more loads and misses to the L1, L2, and L3 caches as well. Finally, keras model caused more stalled cycles in the backend waiting for memory. Overall, keras model would be able to process fewer images per run compared to the litert model. However, the result of the prediction based on the keras model was more accurate than the litert model based on the user experience.
